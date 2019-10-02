@@ -431,21 +431,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 
 <div id="content">
     <div class="sect1">
-    <h2 id="trueprimeira-unidade"><a class="anchor" href="#trueprimeira-unidade"></a>Primeira Unidade</h2>
+    <h2 id="trueprimeira-unidade">Primeira Unidade</h2>
     <div class="sectionbody">
     <div class="sect2">
-    <h3 id="true1-manipulando-pixels-em-uma-imagem"><a class="anchor" href="#true1-manipulando-pixels-em-uma-imagem"></a>1. Manipulando pixels em uma imagem</h3>
+    <h3 id="true1-manipulando-pixels-em-uma-imagem">1. Manipulando pixels em uma imagem</h3>
     <div class="sect3">
-    <h4 id="true1-1-regi-o-negativa-em-uma-imagem"><a class="anchor" href="#true1-1-regi-o-negativa-em-uma-imagem"></a>1.1 Negativo de uma Imagem</h4>
-    <div class="paragraph">
+    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">1.1 Negativo de uma Imagem</h4>
+    <div class="paragraph" align="justify">
     <p>A primeira prática deste curso consiste em calcular o negativo de uma imagem qualquer, da seguinte forma: Serão definidos dois pontos P1 e P2, localizados dentro dos limites da imagem, de forma que, na imagem final, o retângulo delimitado pelos pontos P1 e P2 (vértices opostos) será exibido com o negativo da imagem original, na região correspondente.
-        <br>O cálculo do negativo foi realizado através da subtração do nível máximo de cinza que pode ser exibido na imagem (255) pelo valor do pixel que se deseja calcular o negativo.
+        <br><br>O cálculo do negativo foi realizado através da subtração do nível máximo de cinza que pode ser exibido na imagem (255) pelo valor do pixel que se deseja calcular o negativo.
     </p>
     </div>
     </div>
     <div class="sect3">
-    <h4 id="truec-digo"><a class="anchor" href="#truec-digo"></a>Código 1.1</h4>
     <div class="listingblock">
+    <div class="title">negativo.cpp</div>
     <div class="content">
     <pre class="highlightjs highlight"><code class="language-cpp" data-lang="cpp">
         
@@ -473,7 +473,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
                 return -1;
             }
             else if (p1[1] &gt; image.rows || p2[1] &gt; image.rows) {
-                cout &lt;&lt; "ERRO: Coordenada x fora da imagem";
+                cout &lt;&lt; "ERRO: Coordenada y fora da imagem";
                 return -1;
             }
         
