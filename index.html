@@ -438,7 +438,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     <div class="sect3">
     <h4 id="true1-1-regi-o-negativa-em-uma-imagem">1.1 Negativo de uma Imagem</h4>
     <div class="paragraph" align="justify">
-    <p>A primeira prática deste curso consiste em calcular o negativo de uma imagem qualquer, da seguinte forma: Serão definidos dois pontos P1 e P2, localizados dentro dos limites da imagem, de forma que, na imagem final, o retângulo delimitado pelos pontos P1 e P2 (vértices opostos) será exibido com o negativo da imagem original, na região correspondente.
+    <p>O primeiro exercício da prática 1 deste curso consiste em calcular o negativo de uma imagem qualquer, da seguinte forma: Serão definidos dois pontos P1 e P2, localizados dentro dos limites da imagem, de forma que, na imagem final, o retângulo delimitado pelos pontos P1 e P2 (vértices opostos) será exibido com o negativo da imagem original, na região correspondente.
         <br><br>O cálculo do negativo foi realizado através da subtração do nível máximo de cinza que pode ser exibido na imagem (255) pelo valor do pixel que se deseja calcular o negativo.
     </p>
     </div>
@@ -449,8 +449,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     <div class="content">
     <img src="biel.png" alt="biel.png">
     </div>
-    <div class="title">biel.png</div><br>
+    <div class="title">biel.png</div><br><br>
     <div class="sect3">
+    <h3>Código: </h3>
     <div class="listingblock">
     <div class="title">negativo.cpp</div>
     <div class="content">
@@ -498,15 +499,72 @@ int main(int argc, char** argv) {
         
     return 0;
 }
+    </code></pre>
+    </div>
+    </div>
+    <h4>Resultado</h4>
+    <div class="content">
+    <img src="negativo.png" alt="negativo.png">
+    </div>
+    <div class="title">negativo.png</div><br><br>
+    
+    
+    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">1.2 Troca de Regiões</h4>
+    <div class="paragraph" align="justify">
+    <p>No segundo exercício da primeira prática, o objetivo é dividir uma imagem em 4 quadrantes e trocar suas posições em diagonal. Como está exemplificado na figura abaixo: </p>
+    </div>
+    <div class="content">
+    <img src="teste_troca.png" alt="exemplo_troca.png">
+    </div>
+    <div class="paragraph" align="justify">
+        <p>Para realizar a troca de quadrantes, foi necessário utilizar a função <i>Rect</i> para definir o tamanho de cada quadrante com metade da largura e altura da imagem original, a função <i>Mat</i> que cria um array de imagens, onde representará a imagem final do algoritmo. Por fim, também foi utilizada a função <i>copyTo</i> para copiar cada quadrante para o array de imagens.</p>
+    </div>
+    </div>
+    <div class="sect3">
+    <h3>Código: </h3>
+    <div class="listingblock">
+    <div class="title">trocaRegioes.cpp</div>
+    <div class="content">
+    <pre class="highlightjs highlight"><code class="language-cpp" data-lang="cpp">
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int, char**) {
+
+	Mat image;
+	int width, length;
+
+	image = imread("biel.png");
+	if (!image.data)
+		cout &lt;&lt; "A imagem não pôde ser carregada" &lt;&lt; endl;
+
+	width = image.size().width;
+	length = image.size().height;
+
+	Mat troca(length, width, image.type());
+
+	image(Rect(0, 0, width / 2, length / 2)).copyTo(troca(Rect(width / 2, length / 2, width / 2, length / 2))); //A PARA D
+	image(Rect(0, length / 2, width / 2, length / 2)).copyTo(troca(Rect(width / 2, 0, width / 2, length / 2))); // D PARA A
+	image(Rect(width / 2, 0, width / 2, length / 2)).copyTo(troca(Rect(0, length / 2, width / 2, length / 2))); // B PARA C
+	image(Rect(width / 2, length / 2, width / 2, length / 2)).copyTo(troca(Rect(0, 0, width / 2, length / 2))); // C PARA B
+
+	imwrite("troca.png", troca);
+	imshow("image", troca);
+	waitKey();
+	return 0;
+}       
 </code></pre>
 </div>
 </div>
 <h4>Resultado</h4>
 <div class="content">
-<img src="negativo.png" alt="negativo.png">
+<img src="troca.png" alt="troca.png">
 </div>
-<div class="title">negativo.png</div><br>
-    
+<div class="title">troca.png</div><br>    
+        
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
