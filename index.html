@@ -680,10 +680,108 @@ int main(int argc, char** argv) {
 	</div>
 	</div>
 	<h4>Resultado</h4>
+	<p>Objetos: 21<br>Buracos: 7</p>
 	<div class="content">
 	<img src="labeling.png" alt="labeling.png">
 	</div>
 	<div class="title">labeling.png</div><br>
+		
+	<h3 id="true1-manipulando-pixels-em-uma-imagem">3. Manipulação de histogramas</h3>
+    <div class="sect3">
+    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">3.1 Equalização de Histogramas</h4>
+    <div class="paragraph" align="justify">
+    <p>Neste exercício 1 da prática 3, vamos trabalhar o conceito de Equalização de Histograma, que no caso de PDI, consiste em uma melhor distribuição dos tons de cinza de uma imagem, visto que o histograma, neste caso, é aplicado para armazenar todos os tons de cinza existentes numa imagem qualquer. </p>
+    </div>
+    <div class="paragraph" align="justify">
+    <p>Dessa forma, vamos utilizar a função <i>equalizeHist</i> para aplicar a equalização de histograma em cada frame da captura de tela, em tempo real, através da <i>wemcam</i> do Computador. </p>
+    </div>
+    </div>
+    <div class="sect3">
+    <h3>Código: </h3>
+    <div class="listingblock">
+    <div class="title">negativo.cpp</div>
+    <div class="content">
+    <pre class="highlightjs highlight"><code class="language-cpp" data-lang="cpp">
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv) {
+
+	Mat image, image_eq, hist, hist_eq;
+	VideoCapture cap;
+	int nbins = 64;
+	float range[] = { 0, 256 };
+	const float* histrange = { range };
+	int key;
+
+	bool uniform = true;
+	bool acummulate = false;
+
+	cap.open(0);
+
+	if (!cap.isOpened()) {
+		cout &lt;&lt; "ERRO NA CÂMERA";
+		return -1;
+	}
+
+	int histw = nbins, histh = nbins / 2;
+	Mat histImg(histh, histw, CV_8UC1, Scalar(0, 0, 0));
+	Mat histImg_eq(histh, histw, CV_8UC1, Scalar(0, 0, 0));
+
+	while (true) {
+
+		cap &gt;&gt; image;
+		cvtColor(image, image, COLOR_BGR2GRAY);
+		equalizeHist(image, image_eq);
+
+		calcHist(&image, 1, 0, Mat(), hist, 1,
+			&nbins, &histrange,
+			uniform, acummulate);
+		calcHist(&image_eq, 1, 0, Mat(), hist_eq, 1,
+			&nbins, &histrange,
+			uniform, acummulate);
+
+
+		normalize(hist, hist, 0, histImg.rows, NORM_MINMAX, -1, Mat());
+		normalize(hist_eq, hist_eq, 0, histImg_eq.rows, NORM_MINMAX, -1,
+			Mat());
+
+		histImg.setTo(Scalar(0));
+		histImg_eq.setTo(Scalar(0));
+
+		for (int i = 0; i &lt; nbins; i++) {
+			line(histImg,
+				Point(i, histh),
+				Point(i, histh - cvRound(hist.at&lt;float&gt;(i))),
+				Scalar(255, 255, 255), 1, 8, 0);
+			line(histImg_eq,
+				Point(i, histh),
+				Point(i, histh - cvRound(hist_eq.at&lt;float&gt;(i))),
+				Scalar(255, 255, 255), 1, 8, 0);
+		}
+
+		histImg.copyTo(image(Rect(0, 0, nbins, histh)));
+		histImg_eq.copyTo(image_eq(Rect(0, 0, nbins, histh)));
+
+		imshow("Imagem Original", image);
+		imshow("Imagem Equalizada", image_eq);
+		imwrite("original.png", image);
+		imwrite("equalizada.png", image_eq);
+		key = waitKey(30);
+	}
+	return 0;
+}
+    </code></pre>
+    </div>
+    </div>
+    <h4>Resultado</h4>
+    <div class="content">
+    <img src="original.png" alt="original.png">
+    <img src="equalizada.png" alt="equalizada.png">
+    </div>
 	
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
