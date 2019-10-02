@@ -556,15 +556,135 @@ int main(int, char**) {
 	waitKey();
 	return 0;
 }       
-</code></pre>
-</div>
-</div>
-<h4>Resultado</h4>
-<div class="content">
-<img src="troca.png" alt="troca.png">
-</div>
-<div class="title">troca.png</div><br>    
-        
+	</code></pre>
+	</div>
+	</div>
+	<h4>Resultado</h4>
+	<div class="content">
+	<img src="troca.png" alt="troca.png">
+	</div>
+	<div class="title">troca.png</div><br>
+	
+	<h3 id="true1-manipulando-pixels-em-uma-imagem">2. Preenchendo Regiões</h3>
+    	<div class="sect3">
+	<h4 id="true1-1-regi-o-negativa-em-uma-imagem">2.1 Rotulação (<i>Labeling</i>): Parte 1</h4>
+    	<div class="paragraph" align="justify">
+    	<p>Na imagem, cada pixel só pode ser representado por 8 bits, ou seja, 256 possibilidades. Caso existam mais de 255 objetos na cena, onde cada objeto seria representado por uma cor diferente, o computador não conseguiria representá-lo na imagem, pois cada pixel da matriz não pode ter valor maior que 255. Então, uma solução, é atribuir uma cor diferente para cada tipo de objeto e não para cada objeto em si.</p>
+	</div>
+	
+	<h4 id="true1-1-regi-o-negativa-em-uma-imagem">2.2 Rotulação (<i>Labeling</i>): Parte 2</h4>
+    	<div class="paragraph" align="justify">
+	<p>No segundo exercício desta prática, vamos realizar uma contagem de objetos em uma cena. Neste caso, em específico, vamos
+	   contar as bolhas de uma imagem, e cada bolha por conter buracos ou não.</p>
+	</div>
+	<div class="paragraph" align="justify">
+	<p>Primeiro, vamos utilizar a função <i>FloodFill</i> do OpenCV para "apagar" as bolhas que se encontram nas bordas da imagem, visto que não temos como determinar se elas estão protegidas ou não. Depois, aplicamos a função <i>FloodFill</i> no fundo da imagem para diferenciar as regiões que são bolhas ou buracos do plano de fundo.</p>
+	</div>
+	 <h3>Código: </h3>
+    <div class="listingblock">
+    <div class="title">trocaRegioes.cpp</div>
+    <div class="content">
+    <pre class="highlightjs highlight"><code class="language-cpp" data-lang="cpp">
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv) {
+	Mat image;
+	int width, height;
+	int nobjects, nburacos;
+	Point p;
+	image = imread("bolhas.png", IMREAD_GRAYSCALE);
+
+	if (!image.data)
+		cout &lt;&lt; "Imagem nao aberta" &lt;&lt; endl;
+
+	width = image.size().width;
+	height = image.size().height;
+
+	p.x = 0;
+	p.y = 0;
+
+	// remover objetos das bordas verticais
+	for (int i = 0; i &lt; height; i++) {
+		if (image.at&lt;uchar&gt;(i, 0) == 255) {
+			p.x = 0;
+			p.y = i;
+			floodFill(image, p, 0);
+		}
+
+		if (image.at&lt;uchar&gt;(i, width - 1) == 255) {
+			p.x = width - 1;
+			p.y = i;
+			floodFill(image, p, 0);
+		}
+	}
+
+	// remover objetos das bordas horizontais
+	for (int i = 1; i &lt; width - 1; i++) {
+		if (image.at&lt;uchar&gt;(0, i) == 255) {
+			p.x = i;
+			p.y = 0;
+			floodFill(image, p, 0);
+		}
+
+		if (image.at&lt;uchar&gt;(height - 1, i) == 255) {
+			p.x = i;
+			p.y = height - 1;
+			floodFill(image, p, 0);
+		}
+	}
+
+	p.x = 0;
+	p.y = 0;
+	floodFill(image, p, 120);
+
+	// busca objetos
+	nobjects = 0;
+	for (int i = 0; i &lt; height; i++) {
+		for (int j = 0; j &lt; width; j++) {
+			if (image.at&lt;uchar&gt;(i, j) == 255) {
+				// achou um objeto
+				nobjects++;
+				p.x = j;
+				p.y = i;
+				floodFill(image, p, 50);
+			}
+		}
+	}
+
+	// numero de buracos
+	nburacos = 0;
+	for (int i = 0; i &lt; height; i++) {
+		for (int j = 0; j &lt; width; j++) {
+			if (image.at&lt;uchar&gt;(i, j) == 0) { //encontrou objeto
+				nburacos++;
+				p.x = j;
+				p.y = i;
+				floodFill(image, p, 200);
+			}
+		}
+	}
+
+	imshow("image", image);
+	imwrite("labeling.png", image);
+	waitKey();
+
+	cout &lt;&lt; "Numero de objetos " &lt;&lt; nobjects &lt;&lt; endl;
+	cout &lt;&lt; "Numero de buracos " &lt;&lt; nburacos &lt;&lt; endl;
+	return 0;
+}
+	</code></pre>
+	</div>
+	</div>
+	<h4>Resultado</h4>
+	<div class="content">
+	<img src="labeling.png" alt="labeling.png">
+	</div>
+	<div class="title">labeling.png</div><br>
+	
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
