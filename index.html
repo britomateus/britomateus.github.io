@@ -699,7 +699,7 @@ int main(int argc, char** argv) {
     <div class="sect3">
     <h3>Código: </h3>
     <div class="listingblock">
-    <div class="title">negativo.cpp</div>
+    <div class="title">equaliza.cpp</div>
     <div class="content">
     <pre class="highlightjs highlight"><code class="language-cpp" data-lang="cpp">
 #include &lt;iostream&gt;
@@ -784,6 +784,111 @@ int main(int argc, char** argv) {
     <img src="equalizada.png" alt="equalizada.png">
     <div class="title">Imagem Equalizada</div>
     </div>
+	   
+    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">3.2 Algoritmo Detector de Movimento</h4>
+    <div class="paragraph" align="justify">
+    <p>Nesta prática, vamos criar um algoritmo de detecção de movimento em uma cena, baseado em comparação de histogramas. O objetivo é calcular continuamente o histograma de cada frame de uma captura de imagens, caso exista diferença entre os histogramas, quer dizer que um pixel foi deslocado na imagem, vamos estabelecer um limite, tal que, caso a diferença entre os histogramas seja maior que ele, o algoritmo interpretará que houve movimento na captura.
+    </div>
+    </div>
+    <div class="sect3">
+    <h3>Código: </h3>
+    <div class="listingblock">
+    <div class="title">motiondetector.cpp</div>
+    <div class="content">
+    <pre class="highlightjs highlight"><code class="language-cpp" data-lang="cpp">
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv) {
+
+	Mat image, image2;
+	vector&lt;Mat&gt; planes;
+	Mat histR, histR2;
+	int width, height;
+	VideoCapture cap;
+	float diferenca;
+	int nbins = 64;
+	float range[] = { 0, 256 };
+	const float* histrange = { range };
+	int key;
+
+	bool uniform = true;
+	bool acummulate = false;
+
+	cap.open("video.mp4");
+
+	if (!cap.isOpened()) {
+		cout &lt;&lt; "ERRO NA CAMERA";
+		return -1;
+	}
+
+	width = cap.get(CAP_PROP_FRAME_WIDTH);
+	height = cap.get(CAP_PROP_FRAME_HEIGHT);
+	cout &lt;&lt; "largura=" &lt;&lt; width &lt;&lt; "\n";;
+	cout &lt;&lt; "altura =" &lt;&lt; height &lt;&lt; "\n";;
+
+	int histw = nbins, histh = nbins / 2;
+	Mat histImgR(histh, histw, CV_8UC3, Scalar(0, 0, 0));
+	Mat histImgR2(histh, histw, CV_8UC3, Scalar(0, 0, 0));
+	bool primeira_imagem = true;
+
+	while (true) {
+
+		cap &gt;&gt; image;
+		split(image, planes);
+
+		if (!primeira_imagem) {
+			histR.copyTo(histR2);
+			histImgR.copyTo(histImgR2);
+		}
+
+		calcHist(&planes[0], 1, 0, Mat(), histR, 1,
+			&nbins, &histrange,
+			uniform, acummulate);
+		normalize(histR, histR, 0, histImgR.rows, NORM_MINMAX, -1, Mat());
+
+		histImgR.setTo(Scalar(0));
+
+
+		for (int i = 0; i &lt; nbins; i++) {
+			line(histImgR,
+				Point(i, histh),
+				Point(i, histh - cvRound(histR.at&lt;float&gt;(i))),
+				Scalar(0, 0, 255), 1, 8, 0);
+		}
+
+		histImgR.copyTo(image(Rect(0, 0, nbins, histh)));
+
+		if (!primeira_imagem) {
+			histImgR2.copyTo(image(Rect(0, histh, nbins, histh)));
+			image2 = image;
+		}
+
+		if (!primeira_imagem) {
+			diferenca = compareHist(histR, histR2, HISTCMP_CORREL);
+			if (diferenca &gt; 0.8) {
+				putText(image, "DETECTADO", Point(70, 50),
+					FONT_HERSHEY_SIMPLEX, .7,
+					Scalar(0, 255, 0, 255), 2);
+			}
+		}
+
+		primeira_imagem = false;
+		imshow("Imagem", image);
+		key = waitKey(30);
+	}
+	return 0;
+}
+    </code></pre>
+    </div>
+    </div>
+    <h4>Resultado</h4>
+    <div class="content">
+    <img src="mov_detectado.png" alt="detectado.png"><br>
+    <div class="title">O movimento foi detectado em cada frame do video, logo, o algoritmo funcionou corretamente!</div><br><br>
 	
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
