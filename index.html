@@ -433,10 +433,43 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     <div class="sect1">
     <h2 id="trueprimeira-unidade">Primeira Unidade</h2>
     <div class="sectionbody">
+    <h3><b>Conteúdo</b></h3>
+	<ul class="sectlevel1">
+		<li><a href="#manipulando_pixels_em_uma_imagem">1. Manipulando pixels em uma imagem</a>
+		<ul class="sectlevel2">
+			<li><a href="#negativo">1.1. Negativo de uma Imagem</a></li>
+			<li><a href="#troca_regioes">1.2. Troca de regiões</a></li>
+		</ul>
+	<li><a href="#preenchendo_regioes">2. Preenchendo regiões</a></li>
+		<ul class="sectlevel2">
+			<li><a href="#labeling_1">2.1. Rotulação (<i>Labeling</i>): Parte 1</a></li>
+			<li><a href="#labeling_2">2.2. Rotulação (<i>Labeling</i>): Parte 2</a></li>
+		</ul>
+	</li>
+	<li><a href="#histogramas">3. Manipulação de histogramas</a>
+		<ul class="sectlevel2">
+			<li><a href="#equalize">3.1 Equalização de Histogramas</a></li>
+			<li><a href="#motiondetector">3.2. Algoritmo Detector de Movimento</a></li>
+		</ul>
+	</li>
+	<li><a href="#filtragem_dominio_espacial_1">4. Filtragem no domínio espacial I</a>
+		<ul class="sectlevel2">
+			<li><a href="#laplgauss">4.1. Algoritmo do Laplaciano do Gaussiano</a></li>
+		</ul>
+	</li>
+	<li><a href="#filtragem_dominio_espacial_2">5. Filtragem no domínio espacial II</a>
+		<ul class="sectlevel2">
+			<li><a href="#tiltshift_imagem">5.1. Efeito Tilt-Shift: Imagem</a></li>
+			<li><a href="#tiltshift_video">5.2. Efeito Tilt-Shift: Video</a></li>
+		</ul>
+	</li>
+	</ul>
+	    
+	    
     <div class="sect2">
-    <h3 id="true1-manipulando-pixels-em-uma-imagem">1. Manipulando pixels em uma imagem</h3>
+    <h3 id="manipulando_pixels_em_uma_imagem">1. Manipulando pixels em uma imagem</h3>
     <div class="sect3">
-    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">1.1 Negativo de uma Imagem</h4>
+    <h4 id="negativo">1.1. Negativo de uma Imagem</h4>
     <div class="paragraph" align="justify">
     <p>O primeiro exercício da prática 1 deste curso consiste em calcular o negativo de uma imagem qualquer, da seguinte forma: Serão definidos dois pontos P1 e P2, localizados dentro dos limites da imagem, de forma que, na imagem final, o retângulo delimitado pelos pontos P1 e P2 (vértices opostos) será exibido com o negativo da imagem original, na região correspondente.
         <br><br>O cálculo do negativo foi realizado através da subtração do nível máximo de cinza que pode ser exibido na imagem (255) pelo valor do pixel que se deseja calcular o negativo.
@@ -509,7 +542,7 @@ int main(int argc, char** argv) {
     <div class="title">negativo.png</div><br><br>
     
     
-    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">1.2 Troca de Regiões</h4>
+    <h4 id="troca_regioes">1.2. Troca de Regiões</h4>
     <div class="paragraph" align="justify">
     <p>No segundo exercício da primeira prática, o objetivo é dividir uma imagem em 4 quadrantes e trocar suas posições em diagonal. Como está exemplificado na figura abaixo: </p>
     </div>
@@ -565,14 +598,14 @@ int main(int, char**) {
 	</div>
 	<div class="title">troca.png</div><br>
 	
-	<h3 id="true1-manipulando-pixels-em-uma-imagem">2. Preenchendo Regiões</h3>
+	<h3 id="preenchendo_regioes">2. Preenchendo Regiões</h3>
     	<div class="sect3">
-	<h4 id="true1-1-regi-o-negativa-em-uma-imagem">2.1 Rotulação (<i>Labeling</i>): Parte 1</h4>
+	<h4 id="labeling_1">2.1. Rotulação (<i>Labeling</i>): Parte 1</h4>
     	<div class="paragraph" align="justify">
     	<p>Na imagem, cada pixel só pode ser representado por 8 bits, ou seja, 256 possibilidades. Caso existam mais de 255 objetos na cena, onde cada objeto seria representado por uma cor diferente, o computador não conseguiria representá-lo na imagem, pois cada pixel da matriz não pode ter valor maior que 255. Então, uma solução, é atribuir uma cor diferente para cada tipo de objeto e não para cada objeto em si.</p>
 	</div>
 	
-	<h4 id="true1-1-regi-o-negativa-em-uma-imagem">2.2 Rotulação (<i>Labeling</i>): Parte 2</h4>
+	<h4 id="labeling_2">2.2. Rotulação (<i>Labeling</i>): Parte 2</h4>
     	<div class="paragraph" align="justify">
 	<p>No segundo exercício desta prática, vamos realizar uma contagem de objetos em uma cena. Neste caso, em específico, vamos
 	   contar as bolhas de uma imagem, e cada bolha por conter buracos ou não.</p>
@@ -686,9 +719,9 @@ int main(int argc, char** argv) {
 	</div>
 	<div class="title">labeling.png</div><br>
 		
-	<h3 id="true1-manipulando-pixels-em-uma-imagem">3. Manipulação de histogramas</h3>
+	<h3 id="histogramas">3. Manipulação de histogramas</h3>
     <div class="sect3">
-    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">3.1 Equalização de Histogramas</h4>
+    <h4 id="equalize">3.1. Equalização de Histogramas</h4>
     <div class="paragraph" align="justify">
     <p>Neste exercício 1 da prática 3, vamos trabalhar o conceito de Equalização de Histograma, que no caso de PDI, consiste em uma melhor distribuição dos tons de cinza de uma imagem, visto que o histograma, neste caso, é aplicado para armazenar todos os tons de cinza existentes numa imagem qualquer. </p>
     </div>
@@ -785,7 +818,7 @@ int main(int argc, char** argv) {
     <div class="title">Imagem Equalizada</div>
     </div>
 	   
-    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">3.2 Algoritmo Detector de Movimento</h4>
+    <h4 id="motiondetector">3.2. Algoritmo Detector de Movimento</h4>
     <div class="paragraph" align="justify">
     <p>Nesta prática, vamos criar um algoritmo de detecção de movimento em uma cena, baseado em comparação de histogramas. O objetivo é calcular continuamente o histograma de cada frame de uma captura de imagens, caso exista diferença entre os histogramas, quer dizer que um pixel foi deslocado na imagem, vamos estabelecer um limite, tal que, caso a diferença entre os histogramas seja maior que ele, o algoritmo interpretará que houve movimento na captura.
     </div>
@@ -891,9 +924,9 @@ int main(int argc, char** argv) {
     <div class="title">Print do Video de Saída: O movimento foi detectado em cada frame do video, logo, o algoritmo funcionou corretamente!</div><br><br>
 	    
 	    
-    <h3 id="true1-manipulando-pixels-em-uma-imagem">4. Filtragem no domínio espacial I</h3>
+    <h3 id="filtragem_dominio_espacial_1">4. Filtragem no domínio espacial I</h3>
     <div class="sect3">
-    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">4.1 Algoritmo do Laplaciano do Gaussiano</h4>
+    <h4 id="lapgauss">4.1. Algoritmo do Laplaciano do Gaussiano</h4>
     <div class="paragraph" align="justify">
     <p>Utilizado como base o algoritmo do Orientador Agostinho Brito (https://agostinhobritojr.github.io/tutorial/pdi/exemplos/filtroespacial.cpp), foi desenvolvido o algoritmo para calcular o Laplaciano do Gaussiano, que, quando comparado com o filtro do Laplaciano, ele apresenta uma melhor remoção de ruídos.</p>
     </div>
@@ -1065,9 +1098,9 @@ int main(int argvc, char** argv) {
     <div class="title">Imagem com Aplicação do Filtro</div>
     </div>
 	    
-    <h3 id="true1-manipulando-pixels-em-uma-imagem">5. Filtragem no domínio espacial II</h3>
+    <h3 id="filtragem_dominio_espacial_2">5. Filtragem no domínio espacial II</h3>
     <div class="sect3">
-    <h4 id="true1-1-regi-o-negativa-em-uma-imagem">5.1 Efeito Tilt-Shift: Imagem</h4>
+    <h4 id="tiltshift_imagem">5.1. Efeito Tilt-Shift: Imagem</h4>
     <div class="paragraph" align="justify">
     <p>Nesta prática, vamos abordar o conhecido efeito <i>Tilt-Shift</i>, uma técnica de fotografia que desfoca regiões específicas de uma imagem, através de rotações entre o plano de foco e o plano de projeção. Neste caso, vamos utilizar Processamento Digital de Imagens com a utilização de filtragem no domínio da frequência para simular o efeito.</p>
     <p>Vamos utilziar o código base fornecido pelo orientador Agostinho Brito (https://agostinhobritojr.github.io/tutorial/pdi/exemplos/addweighted.cpp) para inserir no programa uma interface com:</p>
@@ -1186,7 +1219,7 @@ int main(int argvc, char** argv) {
     <img src="tilt-shift.png" alt="tilt-shift.png">
     </div>
 
-        <h4 id="true1-1-regi-o-negativa-em-uma-imagem">5.2 Efeito Tilt-Shift: Video</h4>
+        <h4 id="tiltshift_video">5.2. Efeito Tilt-Shift: Video</h4>
     <div class="paragraph" align="justify">
     <p>No segundo exercício da prática 5, vamos utilizar o mesmo princípio do exercício 5.1 para, dessa vez, realizar o efeito <i>Tilt-Shift</i> em um vídeo. Para isso, vamos descartar alguns frames do video (simulando um <i>Stop Motion</i>) para dar uma maior percepção do efeito, além disso, o <i>Tilt-Shift</i> se dará pela junção de dois videos, um com imagem desfocada e outro com a imagem focada.</p>	    
     </div>
