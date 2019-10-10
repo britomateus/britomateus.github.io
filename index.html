@@ -888,7 +888,7 @@ int main(int argc, char** argv) {
     <h4>Resultado</h4>
     <div class="content">
     <img src="mov_detectado.png" alt="detectado.png"><br>
-    <div class="title">O movimento foi detectado em cada frame do video, logo, o algoritmo funcionou corretamente!</div><br><br>
+    <div class="title">Print do Video de Saída: O movimento foi detectado em cada frame do video, logo, o algoritmo funcionou corretamente!</div><br><br>
 	    
 	    
     <h3 id="true1-manipulando-pixels-em-uma-imagem">4. Filtragem no domínio espacial I</h3>
@@ -1069,7 +1069,7 @@ int main(int argvc, char** argv) {
     <div class="sect3">
     <h4 id="true1-1-regi-o-negativa-em-uma-imagem">5.1 Efeito Tilt-Shift: Imagem</h4>
     <div class="paragraph" align="justify">
-    <p>Nesta prática, vamos abordar o conhecido efeito Tilt-Shift, uma técnica de fotografia que desfoca regiões específicas de uma imagem, através de rotações entre o plano de foco e o plano de projeção. Neste caso, vamos utilizar Processamento Digital de Imagens com a utilização de filtragem no domínio da frequência para simular o efeito.</p>
+    <p>Nesta prática, vamos abordar o conhecido efeito <i>Tilt-Shift</i>, uma técnica de fotografia que desfoca regiões específicas de uma imagem, através de rotações entre o plano de foco e o plano de projeção. Neste caso, vamos utilizar Processamento Digital de Imagens com a utilização de filtragem no domínio da frequência para simular o efeito.</p>
     <p>Vamos utilziar o código base fornecido pelo orientador Agostinho Brito (https://agostinhobritojr.github.io/tutorial/pdi/exemplos/addweighted.cpp) para inserir no programa uma interface com:</p>
     <ul>
          <li><p>Ajuste para o decaimento da região borrada;</p></li>
@@ -1184,6 +1184,122 @@ int main(int argvc, char** argv) {
     <h4>Resultado</h4>
     <div class="content">
     <img src="tilt-shift.png" alt="tilt-shift.png">
+    </div>
+
+        <h4 id="true1-1-regi-o-negativa-em-uma-imagem">5.2 Efeito Tilt-Shift: Video</h4>
+    <div class="paragraph" align="justify">
+    <p>No segundo exercício da prática 5, vamos utilizar o mesmo princípio do exercício 5.1 para, dessa vez, realizar o efeito <i>Tilt-Shift</i> em um vídeo. Para isso, vamos descartar alguns frames do video (simulando um <i>Stop Motion</i>) para dar uma maior percepção do efeito, além disso, o <i>Tilt-Shift</i> se dará pela junção de dois videos, um com imagem desfocada e outro com a imagem focada.</p>	    
+    </div>
+    </div>
+    <div class="sect3">
+    <h3>Código: </h3>
+    <div class="listingblock">
+    <div class="title">tiltshift_imagem.cpp</div>
+    <div class="content">
+    <pre class="highlightjs highlight"><code class="language-cpp" data-lang="cpp">
+        
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+#include &lt;math.h&gt;
+using namespace cv;
+using namespace std;
+
+int main(int argvc, char** argv) {
+	VideoCapture video;
+	video.open("video.mp4");
+	int width, height;
+
+	if (!video.isOpened()) {
+		cout &lt;&lt; "cameras indisponiveis";
+		return -1;
+	}
+
+	width = video.get(CAP_PROP_FRAME_WIDTH);
+	height = video.get(CAP_PROP_FRAME_HEIGHT);
+	Size frameSize(static_cast&lt;int&gt;(width), static_cast&lt;int&gt;(height));
+	int codec = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
+	VideoWriter out("video_tiltshift.avi", codec, 5, frameSize, true);
+
+	Mat img_in, img_discard;
+	int cols = video.get(CAP_PROP_FRAME_WIDTH);
+	int rows = video.get(CAP_PROP_FRAME_HEIGHT);
+	int key;
+
+	Mat img_blurred = Mat::zeros(rows, cols, CV_32FC3);
+	Mat img_out = Mat::zeros(rows, cols, CV_32FC3);
+	Mat img_focused = Mat::zeros(rows, cols, CV_32FC3);
+	Mat img_unfocused = Mat::zeros(rows, cols, CV_32FC3);
+	Mat mask_focus = Mat(rows, cols, CV_32FC3, Scalar(0, 0, 0));
+	Mat mask_unfocus = Mat(rows, cols, CV_32FC3, Scalar(1, 1, 1));
+
+	int frame_skip = 2;
+	int pass_frame = 0;
+
+	float unfocus_aux = 0.35;
+	int pos_i = unfocus_aux * rows;
+	int pos_f = rows - unfocus_aux * rows;
+	int decay = 70;
+
+	Vec3f mask_function_value;
+
+	for (int i = 0; i &lt; rows; i++) {
+		for (int j = 0; j &lt; cols; j++) {
+			mask_function_value[0] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_function_value[1] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_function_value[2] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_focus.at&lt;Vec3f&gt;(i, j) = mask_function_value;
+		}
+	}
+	mask_unfocus = mask_unfocus - mask_focus;
+
+
+	while (true) {
+		if (pass_frame == 0) {
+			video &gt;&gt; img_in;
+		}
+		else {
+			video &gt;&gt; img_discard;
+		}
+
+		img_in.convertTo(img_in, CV_32FC3);
+		GaussianBlur(img_in, img_blurred, Size(7, 7), 0, 0);
+
+		img_focused = img_in.mul(mask_focus);
+		img_unfocused = img_blurred.mul(mask_unfocus);
+
+		img_blurred.convertTo(img_blurred, CV_8UC3);
+
+		img_out = img_focused + img_unfocused;
+		img_out.convertTo(img_out, CV_8UC3);
+
+		img_focused.convertTo(img_focused, CV_8UC3);
+		img_unfocused.convertTo(img_unfocused, CV_8UC3);
+		imshow("img_focused", img_focused);
+		imshow("img_unfocused", img_unfocused);
+
+		if (pass_frame == 0) {
+			pass_frame = frame_skip;
+		}
+		else {
+			pass_frame -= 1;
+		}
+
+		imshow("Efeito tiltshift", img_out);
+		key = waitKey(30);
+	}
+	return 0;
+}
+    </code></pre>
+    </div>
+    </div>
+    <h4>Resultado</h4>
+    <div class="content">
+    <img src="video_desfocado.png" alt="video_desfocado.png">
+    <div class="title">Print do Video com Imagem Desfocada</div><br><br>
+    <img src="video_focado.png" alt="video_focado.png">
+    <div class="title">Print do Video com Imagem Focada</div><br><br>
+    <img src="video_tiltshift.png" alt="video_tiltshift.png">
+    <div class="title">Print do Video com Efeito <i>Tilt-Shift</i></div>
     </div>
 	
 
