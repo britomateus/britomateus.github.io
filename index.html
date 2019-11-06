@@ -473,6 +473,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 			<li><a href="#homomorfico">6.1. Filtro Homomórfico</a></li>
 		</ul>
 	</ul>
+	<ul class="sectlevel1">
+		<li><a href="#canny">7. Detecção de bordas com o algoritmo de Canny</a>
+		<ul class="sectlevel2">
+			<li><a href="#homomorfico">7.1. Algoritmo Cannypoints</a></li>
+		</ul>
+	</ul>
 	    
 	    
     <div class="sect2">
@@ -1496,9 +1502,9 @@ int main(int argc, char** argv) {
 
 	
 
-    <h3 id="filtragem_dominio_freq">7. Detecção de bordas com o algoritmo de Canny</h3>
+    <h3 id="canny">7. Detecção de bordas com o algoritmo de Canny</h3>
     <div class="sect3">
-    <h4 id="homomorfico">6.1. Algoritmo Cannypoints</h4>
+    <h4 id="cannypoints">7.1. Algoritmo Cannypoints</h4>
     <div class="paragraph" align="justify">
     <p>Nesta prática, vamos tomar como base o Algoritmo de Canny para detecção de bordas e o algoritmo de Pontilhismo, uma técnica de desenho
 	    onde o quadro é pintado usando pontos, e vamos desenvolver o algoritmo Cannypoints, que melhora a imagem gerada pelo Pontilhismo.
@@ -1636,10 +1642,12 @@ int main(int argc, char** argv) {
     </div>
     <h4>Resultado</h4>
     <div class="content">
-    <img src="img_original_homomorfico.png" alt="img_original_homomorfico.png">
-    <div class="title">Imagem Original</div><br><br>
-    <img src="filtro_homomorfico.png" alt="filtro_homomorfico.png">
-    <div class="title">Imagem com aplicação do Filtro Homomórfico</div><br><br>
+    <img src="canny.png" alt="canny.png">
+    <div class="title">Imagem com aplicação do Algoritmo de Detecção de Bordas de Canny</div><br><br>
+    <img src="points.png" alt="points.png">
+    <div class="title">Imagem com aplicação do Algoritmo de Pontilhismo</div><br><br>
+    <img src="cannypoints.png" alt="cannypoints.png">
+    <div class="title">Imagem Final do Algoritmo Cannypoints</div><br><br>
     </div>
 	    
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
