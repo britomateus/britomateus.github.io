@@ -1351,7 +1351,7 @@ int main(int argvc, char** argv) {
     <div class="paragraph" align="justify">
     <p>Nesta prática, vamos abordar a filtragem no domínio da frequência utilizando a Transformada de Fourier, que expressa uma função em termos de outras funções de base senoidal. Neste caso, mais precisamente, iremos utilizar
 	    a Transformada Discreta de Fourier (DFT), já que estamos trabalhando com sinais discretos, as imagens digitais.</p>
-    <p>Nesta prática, vamos implementar o filtro homomórfico, que é baseado na filtragem no domínio da frequência e é utilizado para corrigir a má iluminação de uma cena através dos conceitos de iluminância e radiância. Para realizar o algoritmo, devemos seguir a sequência:</p>
+    <p>A seguir, iremos implementar o filtro homomórfico, que é baseado na filtragem no domínio da frequência e é utilizado para corrigir a má iluminação de uma cena através dos conceitos de iluminância e radiância. Para realizar o algoritmo, devemos seguir a sequência:</p>
     <ul>
          <li><p>Aplicar o logaritmo na parte real da imagem;</p></li>
 	 <li><p>Calcular a Transformada de Fourier, F(u,v);</p></li>
@@ -1496,6 +1496,152 @@ int main(int argc, char** argv) {
 
 	
 
+    <h3 id="filtragem_dominio_freq">7. Detecção de bordas com o algoritmo de Canny</h3>
+    <div class="sect3">
+    <h4 id="homomorfico">6.1. Algoritmo Cannypoints</h4>
+    <div class="paragraph" align="justify">
+    <p>Nesta prática, vamos tomar como base o Algoritmo de Canny para detecção de bordas e o algoritmo de Pontilhismo, uma técnica de desenho
+	    onde o quadro é pintado usando pontos, e vamos desenvolver o algoritmo Cannypoints, que melhora a imagem gerada pelo Pontilhismo.
+	    Você pode ter acesso aos códigos base fornecidos pelo Professor Agostinho Brito nos links:
+	    <br><a href="https://agostinhobritojr.github.io/tutorial/pdi/exemplos/canny.cpp">canny.cpp</a>
+	    <br><a href="https://agostinhobritojr.github.io/tutorial/pdi/exemplos/pontilhismo.cpp">pontilhismo.cpp</a></p>
+    <p>Existem diversas metodologias que podem ser utilizadas para realizar o algoritmo a seguir, nesta prática, vamos usar a posição dos pixels de borda encontrados pelo algoritmo de Canny para desenhar pontos nos respectivos locais na imagem gerada.</p>
+    </div>
+    </div>
+    <div class="sect3">
+    <h3>Código: </h3>
+    <div class="listingblock">
+    <div class="title">cannypoints.cpp</div>
+    <div class="content">
+    <pre class="highlightjs highlight"><code class="language-cpp" data-lang="cpp">
+        
+#include "opencv2/opencv.hpp"
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+#include &lt;ctime&gt;
+#include &lt;numeric&gt;
+
+using namespace std;
+using namespace cv;
+
+#define STEP 4
+#define JITTER 3
+#define RAIO 5
+#define RAIO_PEQUENO 2
+
+int main(int argc, char** argv) {
+	vector&lt;int&gt; xrange, yrange;
+	vector&lt;Vec6i&gt; pontos;
+	Mat points, image, border, image_bw;
+	Vec3b gray;
+	int width, height, limite_inferior = 80;
+	int x, y;
+
+	image = imread("lena.png", IMREAD_COLOR);
+
+	cvtColor(image, image_bw, COLOR_BGR2GRAY);
+
+	width = image.size().width;
+	height = image.size().height;
+
+	//Aplicação do algoritmo de Canny
+	Canny(image_bw, border, limite_inferior, 3 * limite_inferior);
+	imshow("bordas_canny", border);
+	imwrite("canny.png", border);
+	waitKey();
+
+	//Calcula imagem pontilhista
+	xrange.resize(height / STEP);
+	yrange.resize(width / STEP);
+
+	iota(xrange.begin(), xrange.end(), 0);
+	iota(yrange.begin(), yrange.end(), 0);
+
+	//Amostragem dos pontos
+	for (uint i = 0; i &lt; xrange.size(); i++)
+	{
+		xrange[i] = xrange[i] * STEP + STEP / 2;
+	}
+
+	for (uint i = 0; i &lt; yrange.size(); i++)
+	{
+		yrange[i] = yrange[i] * STEP + STEP / 2;
+	}
+
+	points = Mat(height, width, CV_8UC3, Scalar(255, 255, 255));
+
+	random_shuffle(xrange.begin(), xrange.end());
+
+	for (auto i : xrange)
+	{
+		random_shuffle(yrange.begin(), yrange.end());
+		for (auto j : yrange)
+		{
+			x = i + rand() % (2 * JITTER) - JITTER + 1;
+			y = j + rand() % (2 * JITTER) - JITTER + 1;
+
+			//Impede o algoritmo de pegar pontos além dos limites da imagem
+			if (x &gt;= height)
+			{
+				x = height - 1;
+			}
+			if (y &gt;= width)
+			{
+				y = width - 1;
+			}
+
+			gray = image.at&lt;Vec3b&gt;(x, y);
+			circle(points,
+				cv::Point(y, x),RAIO,Scalar(gray[0], gray[1], gray[2]),-1,LINE_AA);
+		}
+	}
+
+	imshow("imagem_pontilhista", points);
+	imwrite("points.png", points);
+	waitKey();
+
+	//Percorre matriz em busca da borda encontrada no algoritmo de canny e desenha pequenos pontos
+	for (int i = 0; i &lt; height; i++)
+	{
+		for (int j = 0; j &lt; width; j++)
+		{
+			//Se achar a borda, armazena a cor original e a posição do ponto
+			if (border.at&lt;uchar&gt;(i, j) != 0)
+			{
+				gray = image.at&lt;Vec3b&gt;(i, j);
+				pontos.push_back(Vec6i(j, i, gray[0], gray[1], gray[2], 0));
+			}
+		}
+	}
+
+	random_shuffle(pontos.begin(), pontos.end());
+
+	//Desenha pontos pequenos na imagem
+	Scalar cor;
+	for (int i = 0; i &lt; pontos.size(); i++)
+	{
+		Point p(pontos.at(i)[0], pontos.at(i)[1]);
+		cor = Scalar(pontos.at(i)[2], pontos.at(i)[3], pontos.at(i)[4]);
+		circle(points,p,RAIO_PEQUENO,cor,-1,LINE_AA);
+	}
+
+	imshow("imagem_pontilhista_corrigida", points);
+	waitKey();
+
+	imwrite("cannypoints.png", points);
+	return 0;
+}
+    </code></pre>
+    </div>
+    </div>
+    <h4>Resultado</h4>
+    <div class="content">
+    <img src="img_original_homomorfico.png" alt="img_original_homomorfico.png">
+    <div class="title">Imagem Original</div><br><br>
+    <img src="filtro_homomorfico.png" alt="filtro_homomorfico.png">
+    <div class="title">Imagem com aplicação do Filtro Homomórfico</div><br><br>
+    </div>
+	    
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
 <script>hljs.initHighlighting()</script>
