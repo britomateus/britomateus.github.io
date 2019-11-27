@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="generator" content="Asciidoctor 1.5.5.dev">
+		<title>Processamento Digital de Imagens</title>
+
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+		<link href="css/projeto_final.css" rel="stylesheet">
+		<link rel="stylesheet"
+			href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+		<link rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+	</head>
+
+	<body id="page-top">
+
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+			<div class="container">
+				<a class="navbar-brand js-scroll-trigger" href="#page-top">Processamento Digital de Imagens</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+					aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+			</div>
+		</nav>
+
+		<header class="bg-success text-white">
+			<div class="container text-center">
+				<h1>Desenhando em imagens com OpenCV e Python</h1>
+				<p class="lead">
+					Jacimara Vitoria Nunes Pacheco e Mateus Medeiros de Assis Brito<br>
+					<a href="mailto:jacimara196@hotmail.com">jacimara196@hotmail.com</a>,
+					<a href="mailto:mateusmbrito@ufrn.edu.br">mateusmbrito@ufrn.edu.br</a>
+				</p>
+			</div>
+		</header>
+
+		<section id="sobre">
+			<h1 class="display-4">Sobre</h1>
+			<p class="lead">Esta página tem como objetivo documentar o Projeto Final desenvolvido para a
+				disciplina de Processamento Digital de Imagens (DCA0445) ofertada pelo Departamento de Engenharia de
+				Computação e Automação da UFRN e ministrada pelo professor Agostinho Brito Júnior.
+			</p>
+		</section>
+
+
+		<section id="introducao" class="bg-light">
+			<div class="conteiner">
+				<h1 class="display-4">Introdução</h1>
+			</div>
+			<p class="lead">
+				<strong>OpenCV</strong> (<i>Open Source Computer Vision</i>) é uma biblioteca de código aberto, com
+				suporte à diversas linguagens de programação e possui variados algoritmos de visão computacional já
+				implementados com um ótimo desempenho, tornando-a uma das ferramentas para desenvolvedores
+				mais conhecidas na área de Processamento Digital de Imagens (PDI).<br>
+				Logo, uma das maiores pesquisas existentes sobre manipulação de imagens é a detecção de
+				objetos em uma cena, que possibilita criar diversas soluções práticas para problemas do mundo real.<br>
+				Neste trabalho, vamos utilizar a detecção de objetos para identificar uma bola brilhante (ou um feixe de
+				luz) em um vídeo, emitida através de uma pequena lanterna. E com isso, poder desenhar livremente na
+				cena, à medida que movimentamos a lanterna.
+			</p>
+		</section>
+
+		<section id="desenvolvimento">
+			<div class="conteiner">
+				<h1 class="display-4">Mão na massa!</h1>
+			</div>
+			<p class="lead">
+				Para o desenvolvimento do algoritmo, através de pesquisas, utilizamos uma biblioteca auxiliar que
+				incorpora funções básicas para manipulação de imagens já implementadas no OpenCV,
+				porém com uso mais prático para Python, a <strong>imutils</strong> (<a style="color: green;"
+					href="https://github.com/jrosebr1/imutils">link para o GitHub</a>).<br><br>
+				Primeiramente, utilizamos um script existente na biblioteca imutils, chamado de
+				<i>range-detector</i>, que permite
+				determinar através de uma trackbar o intervalo de tons nos modelos RGB ou HSV do objeto que queremos
+				identificar no video. Dessa forma,
+				realizamos um teste com a lanterna apontada para a câmera e chegamos aos valores mínimo e máximo de tons
+				em HSV que o objeto ao qual pretendemos identificar
+				poderá ter na captura. A imagem abaixo, mostram como o teste foi realizado:<br>
+				<img src="range-detector.png">
+				<br>
+				Assim, os parâmetros HSV mínimo e máximo foram definidos de forma que na máscara da imagem mostrada na
+				janela "Tresh",
+				estivesse aparecendo apenas o objeto que queremos identificar.<br>
+				O modelo de cor HSV foi escolhido ao invés do usual RGB, pois, para cada tom ou (Matiz), quantidade
+				(Saturação) e intensidade (Brilho) de cor existe um número específico,
+				e assim, conseguimos definir exatamente o tipo de bola brilhante que queremos identificar.<br>
+				Agora que encontramos os parâmetros desejados, vamos começar o código:<br>
+				Importamos todos os pacotes qe bibliotecas que precisamos utilizar e a estrutura
+				<strong>deque</strong> importada de <i>collections</i>, foi utilizada para representar uma fila que irá
+				armazenar as várias posições do centro do objeto identificado ao longo do vídeo, fazendo com que sua
+				trajetória
+				seja desenhada.
+			</p>
+			<pre class="highlightjs highlight" style="font-size: 17px;">
+				<code class="language-py" data-lang="py">
+from collections import deque
+from imutils.video import VideoStream
+import argparse
+import cv2
+import imutils
+				</code>
+			</pre>
+			<p class="lead">
+				Agora, inicializamos os parâmetros necessários, sendo minHSV e maxHSV as variáveis que contêm os valores
+				encontrados no <i>range-detector</i>, pontos é a lista de pontos que serão desenhados na imagem, com
+				valor máximo atribuído de 500, e vs é a variável que vai receber os frames da captura do vídeo.
+			</p>
+			<pre class="highlightjs highlight" style="font-size: 17px;">
+					<code class="language-py" data-lang="py">
+#define o intervalo de tons HSV que poderão ser detectados
+minHSV = (0,0,248) #valor minimo do intervalo
+maxHSV = (255,248,255) #valor maximo do intervalo
+pontos = deque(maxlen=500)
+							 
+vs = VideoStream(src=0).start() #recebe os frames da captura
+					</code>
+				</pre>
+			<p class="lead">
+				O próximo passo é iniciar o loop que será terminado ao pressionar a tecla "s" e será a parte principal
+				do algoritmo, responsável por identificar o objeto e desenhar os pontos em que ele aparece na tela.<br>
+			</p>
+			<pre class="highlightjs highlight" style="font-size: 17px;">
+					<code class="language-py" data-lang="py">
+while True:
+	frame = vs.read() #pega o frame atual
+						 
+	# se não conseguir capturar o frame, encerre o programa
+	if frame is None:
+		break
+							
+	frame = imutils.resize(frame, width=600) #redimensiona o frame para facilitar o processamento da imagem
+	blur = cv2.GaussianBlur(frame, (11, 11), 0) #desfoca o frame para reduzir os ruidos
+	HSV = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV) #transforma o sistema de cores de RGB para HSV					
+					</code>
+				</pre>
+			<p class="lead">
+				A função <i>read</i> chama o método de leitura do ponteiro da câmera, já resize, redimensiona o frame,
+				para que a velocidade de processamento aumente, em seguida ele é desfocado com a <i>GaussianBlur</i>,
+				para diminuir o
+				ruído, e por fim, convertemos o frame para o espaço de cores HSV, para facilitar a obtenção da
+				intensidade do objeto desejado.
+			</p>
+			<pre class="highlightjs highlight" style="font-size: 17px;">
+					<code class="language-py" data-lang="py">
+	mascara = cv2.inRange(HSV, minHSV, maxHSV) #cria a mascara para encontrar a cor que se deseja
+	#remove possiveis falhas da mascara
+	mascara = cv2.erode(mascara, None, iterations=2)
+	mascara = cv2.dilate(mascara, None, iterations=2)				
+					</code>
+				</pre>
+			<p class="lead">
+				A função <i>inRange</i> cria uma máscara com o objeto que queremos identificar, no caso a luz do led,
+				levando
+				em consideração os limites inferior e superior do HSV. Logo após a máscara passa por um processo de
+				erosão e dilatação para remover possíveis borrões.
+			</p>
+			<pre class="highlightjs highlight" style="font-size: 17px;">
+					<code class="language-py" data-lang="py">
+	# encontra o contorno do circulo no frame atual atraves da mascara e marca os pontos (x,y) do seu centro
+	contornos = cv2.findContours(mascara.copy(), cv2.RETR_EXTERNAL,
+	cv2.CHAIN_APPROX_SIMPLE)
+	contornos = imutils.grab_contours(contornos)
+	centro = None			
+					</code>
+				</pre>
+			<p class="lead">
+				<i>findContours</i> é uma função para encontrar os contornos de uma imagem binária. O primeiro parâmetro
+				mascara.copy(),
+				deve ser sempre uma imagem na escala de tom de cinza, o cv2.RETR_EXTERNAL representa o modo de
+				recuperação dos contornos, recuperanado apenas aqueles que são externos extremos. O parâmetro
+				cv2.CHAIN_APPROX_SIMPLE,
+				refere-se ao método de recuperação do contorno, este utilizado tem a função de comprimir segmentos
+				horizontais, verticais e diagonais e deixa apenas seus pontos finais. Por exemplo, um contorno
+				retangular à direita é codificado com 4 pontos.
+			</p>
+			<pre class="highlightjs highlight" style="font-size: 17px;">
+					<code class="language-py" data-lang="py">
+	#se ao menos um contorno foi encontrado
+	if len(contornos) > 0:
+		c = max(contornos, key=cv2.contourArea) #encontra o circulo com maior contorno na mascara
+		#calcula o contorno minimo que envolve o maior circulo
+		((x, y), raio) = cv2.minEnclosingCircle(c)
+		#calcula as coordenadas (x,y) do centro
+		M = cv2.moments(c)
+		centro = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))			
+					</code>
+				</pre>
+			<p class="lead">
+				Inicialmente verifica se pelo menos, um contorno foi encontrado, em seguida c recebe o maior contorno da
+				lista.
+				A função <i>moments</i> é utilizada para calcular o centróide em cada frame, em que os valores das
+				posições x e
+				y são padronizados, segundo a <a
+					href="https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_contours/py_contour_features/py_contour_features.html"
+					style="color: green;">documentação do OpenCV</a>, e <strong>Cx = m10/m00</strong> e <strong>Cy =
+					m01/m00</strong>.<br><br>
+				Em seguida, verificamos se o raio detectado tem tamanho razoável para ser desenhado, caso sim, é
+				desenhado um círculo amarelo em volta dele, depois, as coordenadas do seu centro são adicionadas na
+				lista de pontos, pela esquerda, através do método <i>appendleft</i>.<br>
+				Depois dessas verificações, percorremos cada ponto da lista, até que ela esteja vazia, desenhando uma
+				linha entre a posição atual do objeto no frame e a anterior.<br>
+				Por fim, o algoritmo imprime os frames desenhados na tela e permanece no loop até que seja digitada a
+				letra "s". Abaixo, segue o código para estes últimos passos:<br>
+			</p>
+			<pre class="highlightjs highlight" style="font-size: 17px;">
+					<code class="language-py" data-lang="py">
+	#percorre a lista de pontos
+	for i in range(1, len(pontos)):
+		# se o ponto atual e o anterior forem nulos, ignore
+		if pontos[i - 1] is None or pontos[i] is None:
+			continue
+		# desenha a linha de acordo com os pontos que estão na lista
+		larguraLinha = 10
+		cv2.line(frame, pontos[i - 1], pontos[i], (0, 255, 0), larguraLinha)
+						
+		invertida = cv2.flip(frame, 1) #inverte o frame horizontalmente
+		cv2.imshow("Frame", invertida) #imprime o frame
+						 
+		#encerra o algoritmo se teclar 's'
+		key = cv2.waitKey(1)
+		if key == ord("s"):
+			break
+							
+#fecha todas as janelas
+cv2.destroyAllWindows()		
+					</code>
+				</pre>
+
+				<h1 class="display-4">Resultado</h1>
+				<p class="lead"><strong>O resultado, você pode conferir no GIF logo abaixo!</strong></p>
+				<img src="resultado.gif">
+
+		</section>
+
+		<section id="rodape" class="bg-dark" style="text-align: center;">
+			<p class="lead" style="color: white;">(C) 2019 Jacimara Vitoria e Mateus Medeiros.</p>
+		</section>
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+		<script>hljs.initHighlighting()</script>
+	</body>
+
+</html>

@@ -1,0 +1,26 @@
+header {
+  padding: 150px 0 80px;
+}
+
+.rodape{
+  padding: 150px 0 80px;
+}
+
+
+a, a:hover {
+  color: white;
+}
+
+.desc{
+  font-size: 16px;
+}
+
+section {
+  padding: 50px 50px 20px;
+  text-align: justify;
+}
+
+img{
+  width: 40%;
+  height: 40%;
+}
